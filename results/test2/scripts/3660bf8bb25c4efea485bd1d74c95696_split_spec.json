@@ -1,0 +1,22 @@
+{
+  "HEADER": [
+    "Patient",
+    "RESULT:"
+  ],
+  "RESULT": [
+    "RESULT:",
+    "Variant"
+  ],
+  "TABULATED_SECTION": [
+    "identified.",
+    "About this test"
+  ],
+  "CLINICAL_SUMMARY": [
+    "Clinical summary",
+    "Variant details"
+  ],
+  "VARIANT_DETAILS": [
+    "Variant Details",
+    "Genes analyzed"
+  ]
+}
