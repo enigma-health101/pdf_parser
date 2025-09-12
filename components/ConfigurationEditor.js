@@ -32,7 +32,7 @@ import ReviewStep from '../steps/ReviewStep';
 import ExtractStep from '../steps/ExtractStep';
 import ViewResultsComponent from './ViewResultsComponent';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = '/api';
 
 const ConfigurationEditor = ({
   templateType,
@@ -773,7 +773,7 @@ const ConfigurationEditor = ({
       
       // Make the API call
       const response = await axios.post(`${API_BASE_URL}/pdf/extract-parameters`, requestPayload, {
-        timeout: 300000,
+        timeout: 1000 * 60 * 5,
         maxContentLength: Infinity,
         maxBodyLength: Infinity 
       });
@@ -1421,12 +1421,12 @@ const ConfigurationEditor = ({
                 setSections(allSections);
                 setHasSplitData(true);
 
-                // Load parameters for any existing subsections
+                // Load parameters for any existing sections
                 for (const sec of allSections) {
-                  if (sec.isSubSection) {
+                  //if (sec.isSubSection) {
                     // eslint-disable-next-line no-await-in-loop
                     await loadExistingParameters(sec.id);
-                  }
+                  //}
                 }
                 
                 // Auto-advance to review step since we have existing sections
@@ -1490,12 +1490,12 @@ const ConfigurationEditor = ({
         if (response.data.section_type === 'group' && response.data.consolidated_parameters) {
           console.log('Processing consolidated group parameters');
           
-          transformedParameters = response.data.parameters.map(param => ({
+          transformedParameters = response.data.consolidated_parameters.map(param => ({
             name: param.name || '',
             description: param.description || '',
-            regex: param.regex || '',
+            regex: Array.isArray(param.regex) ? param.regex[0] : (param.regex || ''),
             extractedValue: param.extracted_values || [],
-            value: Array.isArray(param.extracted_values) && param.extracted_values.length > 0 
+            value: Array.isArray(param.extracted_values) && param.extracted_values.length > 0
               ? param.extracted_values.join(', ') 
               : (param.extracted_values || ''),
             isRegularParameter: true,

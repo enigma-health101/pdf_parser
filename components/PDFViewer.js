@@ -34,7 +34,7 @@ const ShrinkIcon = (props) => (
   </svg>
 );
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = '/api';
 
 const PDFViewer = ({ file, fileId, templateType = 'running', onRegionSelect, onDeleteRegion, externalRegions = null }) => {
   const [scale, setScale] = useState(1.0);

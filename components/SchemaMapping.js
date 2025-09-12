@@ -46,7 +46,7 @@ import {
 } from '@chakra-ui/react';
 import { Database, Plus, Trash2, Settings, Check, AlertTriangle, Info, Eye, ArrowLeft, RefreshCw, ChevronRight } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
 
 const SchemaMapping = ({
   project,

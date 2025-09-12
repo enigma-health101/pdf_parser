@@ -45,7 +45,7 @@ import {
 } from '@chakra-ui/react';
 import { Download, ArrowRight, ArrowLeft, BarChart3, Eye } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = '/api';
 
 const ViewResultsComponent = ({ 
   configurationData, 

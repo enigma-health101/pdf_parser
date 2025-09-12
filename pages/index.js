@@ -11,11 +11,15 @@ import StepIndicator from '../components/StepIndicator';
 import SchemaMapping from '../components/SchemaMapping';
 import ViewResultsComponent from '../components/ViewResultsComponent';
 import BatchProcessing from '../components/BatchProcessing';
-import { Box, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack, Button } from '@chakra-ui/react';
+//import MasterProjectList from '../components/MasterProjectList';
+import { ArrowLeft } from 'lucide-react';
+import MasterDashboard from '../components/MasterDashboard';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('projects'); // 'projects', 'setup', 'config', 'viewResults', 'schemaMapping', 'batchProcessing'
   const [step, setStep] = useState(1);
+  const [currentMasterProject, setCurrentMasterProject] = useState(null);
   const [currentProject, setCurrentProject] = useState(null);
   const [templateType, setTemplateType] = useState(null);
   const [files, setFiles] = useState([]);
@@ -65,7 +69,7 @@ export default function Home() {
     // Set loading state or show spinner if needed
     setIsProcessing(true);
     
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
     const projectId = project.project_id || project.projectId;
     
     console.log('Fetching data for project ID:', projectId);
@@ -75,7 +79,7 @@ export default function Home() {
     if (!templateType) {
       try {
         console.log('Fetching template type from API...');
-        const templateResponse = await fetch(`${API_BASE_URL}/config/projects/${projectId}/template-type`);
+        const templateResponse = await fetch(`/api/config/projects/${projectId}/template-type`);
         if (templateResponse.ok) {
           const templateInfo = await templateResponse.json();
           templateType = templateInfo.template_type || 'running';
@@ -266,6 +270,16 @@ export default function Home() {
     setExtractedData({});
   };
 
+  const handleSelectMasterProject = (master) => {
+    setCurrentMasterProject(master);
+    handleBackToProjects();
+  };
+
+  const handleBackToMasters = () => {
+    handleBackToProjects();
+    setCurrentMasterProject(null);
+  };
+
   // Handle back navigation within setup flow
   const handleBackInSetup = () => {
     if (step > 1) {
@@ -303,8 +317,8 @@ export default function Home() {
       let projectFiles = [];
       
       try {
-        const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
-        
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
+
         // If template type is not available, fetch it from the API
         if (!projectTemplateType) {
           console.log('Template type not found, fetching from API...');
@@ -329,7 +343,8 @@ export default function Home() {
         
         // Fetch project files
         console.log('Fetching project files from API...');
-        const filesResponse = await fetch(`${API_BASE_URL}/config/projects/${currentProject.projectId}/files`);
+        const filesResponse = await fetch(`/api/config/projects/${currentProject.projectId}/files`);
+
         
         if (filesResponse.ok) {
           const filesData = await filesResponse.json();
@@ -350,8 +365,8 @@ export default function Home() {
               projectId: currentProject.projectId,
               path: file.path,
               url: file.url,
-              previewUrl: `${API_BASE_URL}/projects/${currentProject.projectId}/configuration/files/${encodeURIComponent(fileId)}/preview`,
-              downloadUrl: `${API_BASE_URL}/projects/${currentProject.projectId}/configuration/files/${encodeURIComponent(fileId)}/preview`
+              previewUrl: `/api/projects/${currentProject.projectId}/configuration/files/${encodeURIComponent(fileId)}/preview`,
+downloadUrl: `/api/projects/${currentProject.projectId}/configuration/files/${encodeURIComponent(fileId)}/preview`
             };
           });
         } else {
@@ -472,17 +487,36 @@ export default function Home() {
     });
   }, [currentView, step, configStep, templateType, sections, parameters, extractedData, currentProject]);
 
+  if (!currentMasterProject) {
+    return (
+      <Layout>
+        <MasterDashboard onSelectMasterProject={handleSelectMasterProject} />
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Box className="min-h-screen flex flex-col">
-        <motion.h1 
-          className="text-3xl font-bold text-center mb-4"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          PDF Parser
-        </motion.h1>
+        <Box mb={4} display="flex" justifyContent="flex-start" alignItems="center">
+          <Button
+            variant="ghost"
+            colorScheme="blue"
+            leftIcon={<ArrowLeft size={16} />}
+            onClick={handleBackToMasters}
+          >
+            Back to Master Projects
+          </Button>
+        </Box>
+
+        <Box textAlign="center" mb={4}>
+          <Heading as="h1" size="lg" mb={1}>
+            Master Project: {currentMasterProject.masterId}
+          </Heading>
+          <Text color="gray.500" fontSize="md" mb={4}>
+            {currentMasterProject.description}
+          </Text>
+        </Box>
 
         {/* Step Indicator - show during setup/config, viewResults, schemaMapping, and batchProcessing */}
         {currentView !== 'projects' && (
@@ -501,7 +535,7 @@ export default function Home() {
           <Heading as="h2" size="lg" mb={1}>
             {getCurrentStepTitle()}
           </Heading>
-          <Text color="gray.500" fontSize="sm">
+          <Text color="gray.400" fontSize="sm">
             {getCurrentStepDescription()}
           </Text>
           {currentProject && (
@@ -529,7 +563,8 @@ export default function Home() {
         >
           {/* Projects View */}
           {currentView === 'projects' && (
-            <ProjectList 
+            <ProjectList
+              masterProjectId={currentMasterProject.masterId}
               onSelectProject={handleSelectProject}
               onViewResults={handleViewResults}
               onSchemaMapping={handleSchemaMapping}

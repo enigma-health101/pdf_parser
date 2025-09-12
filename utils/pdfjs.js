@@ -67,37 +67,25 @@ export function initPdfJs() {
  * Load a PDF document
  */
 export async function getDocument(source) {
-  try {
-    // Initialize PDF.js first
-    await initPdfJs();
-    
-    if (!window.pdfjsLib) {
-      throw new Error('PDF.js is not available');
+    try {
+        // Initialize PDF.js first
+        await initPdfJs();
+
+        if (!window.pdfjsLib) {
+            throw new Error('PDF.js is not available');
+        }
+
+        console.log('Loading PDF document from source:', source);
+
+        // CORRECTED: Remove the logic that adds `window.location.origin`.
+        // Simply pass the source directly to PDF.js.
+        // The browser and the Next.js proxy will handle the rest.
+        const loadingTask = window.pdfjsLib.getDocument(source);
+
+        // Return the document promise
+        return loadingTask.promise;
+    } catch (error) {
+        console.error('Error in getDocument:', error);
+        throw new Error(`PDF loading failed: ${error.message}`);
     }
-    
-    console.log('Loading PDF document:', source);
-    
-    // Handle different source types
-    let documentSource = source;
-    
-    // Handle blob data
-    if (source && typeof source === 'object' && source.data) {
-      documentSource = source;
-    }
-    // Handle URL that needs to be absolute
-    else if (typeof source === 'string') {
-      if (source.startsWith('/')) {
-        documentSource = window.location.origin + source;
-      }
-    }
-    
-    // Create a loading task
-    const loadingTask = window.pdfjsLib.getDocument(documentSource);
-    
-    // Return the document promise
-    return loadingTask.promise;
-  } catch (error) {
-    console.error('Error in getDocument:', error);
-    throw new Error(`PDF loading failed: ${error.message}`);
-  }
 }

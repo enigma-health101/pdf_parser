@@ -54,7 +54,8 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
+console.log('API_BASE_URL:', API_BASE_URL);
 
 // Enhanced status helper functions
 const getStatusColor = (progressPercentage, stage) => {
@@ -85,13 +86,20 @@ const getProgressBarColor = (progressPercentage) => {
   else return 'green';
 };
 
+// Map progress percentage to simplified status labels
+const getStatusLabel = (progressPercentage) => {
+  if (progressPercentage <= 10) return 'Draft';
+  if (progressPercentage >= 100) return 'Active';
+  return 'In Config';
+};
+
 // File counts display component
 const FileCountsDisplay = ({ fileCounts }) => {
   const counts = [
     { label: 'PDFs', count: fileCounts?.pdf_files || 0, icon: FileText, color: 'blue' },
     { label: 'Sections', count: fileCounts?.section_configs || 0, icon: Layers, color: 'green' },
-    { label: 'Parameters', count: fileCounts?.param_configs || 0, icon: Database, color: 'purple' },
-    { label: 'Outputs', count: fileCounts?.output_files || 0, icon: Download, color: 'orange' }
+    { label: 'Params', count: fileCounts?.param_total || 0, icon: Database, color: 'purple' },
+    { label: 'Processed', count: fileCounts?.processed_files || 0, icon: Download, color: 'orange' }
   ];
 
   return (
@@ -155,6 +163,7 @@ const ProjectProgressStatus = ({ project, onRefresh }) => {
   const StatusIcon = getStatusIcon(project.progress_percentage || 0, project.stage);
   const progressColor = getProgressBarColor(project.progress_percentage || 0);
   const statusColor = getStatusColor(project.progress_percentage || 0, project.stage);
+  const statusLabel = getStatusLabel(project.progress_percentage || 0);
 
   return (
     <VStack align="start" spacing={2} w="full">
@@ -163,17 +172,16 @@ const ProjectProgressStatus = ({ project, onRefresh }) => {
         <StatusIcon size={14} />
         <VStack align="start" spacing={1} flex="1" minW="0">
           <HStack spacing={2} w="full" justify="space-between">
-            <Badge 
-              colorScheme={statusColor} 
-              size="sm" 
-              px={2} 
+            <Badge
+              colorScheme={statusColor}
+              px={2}
               py={1}
               borderRadius="full"
-              fontSize="xs"
+              fontSize="sm"
             >
-              {project.status_label || 'Unknown'}
+              {statusLabel}
             </Badge>
-            <Text fontSize="xs" fontWeight="bold" color="white">
+            <Text fontSize="sm" fontWeight="bold" color="white">
               {project.progress_percentage || 0}%
             </Text>
           </HStack>
@@ -438,7 +446,7 @@ const ProjectForm = ({ project, mode, onSubmit, onCancel }) => {
   );
 };
 
-const ProjectList = ({ onCreateProject, onSelectProject, onViewResults, onSchemaMapping, onBatchProcessing }) => {
+const ProjectList = ({ masterProjectId, onCreateProject, onSelectProject, onViewResults, onSchemaMapping, onBatchProcessing }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -448,14 +456,17 @@ const ProjectList = ({ onCreateProject, onSelectProject, onViewResults, onSchema
 
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [masterProjectId]);
 
   const loadProjects = async () => {
     try {
       setLoading(true);
       console.log('Loading projects from:', `${API_BASE_URL}/projects`);
       
-      const response = await axios.get(`${API_BASE_URL}/projects`);
+      // const response = await axios.get(`${API_BASE_URL}/projects`);
+      const response = await axios.get(`${API_BASE_URL}/projects`, {
+        params: { masterProjectId }
+      });
       console.log('Projects loaded:', response.data);
       
       setProjects(response.data.projects || []);
@@ -569,7 +580,8 @@ const ProjectList = ({ onCreateProject, onSelectProject, onViewResults, onSchema
         projectId: projectData.projectId,
         description: projectData.description,
         scheduleType: projectData.scheduleType,
-        scheduleTime: projectData.scheduleTime
+        scheduleTime: projectData.scheduleTime,
+        masterProjectId
       });
       
       await loadProjects();
@@ -767,7 +779,14 @@ const ProjectList = ({ onCreateProject, onSelectProject, onViewResults, onSchema
                             <Text fontWeight="medium" color="white" fontSize="sm" noOfLines={1}>
                               {project.project_id}
                             </Text>
-                            <Text fontSize="xs" color="gray.400" noOfLines={2} lineHeight="1.3">
+                            <Text
+                              fontSize="xs"
+                              color="gray.400"
+                              lineHeight="1.3"
+                              wordBreak="break-word"
+                              whiteSpace="normal"
+                              overflowWrap="anywhere"
+                            >
                               {project.description}
                             </Text>
                             <VStack align="start" spacing={1}>

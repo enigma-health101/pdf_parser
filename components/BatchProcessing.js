@@ -79,7 +79,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
 
 const BatchProcessing = ({ project, onBack, onComplete }) => {
   const [status, setStatus] = useState(null);
@@ -868,7 +868,7 @@ const loadDatabaseResults = async () => {
         <Card>
           <CardBody>
             <Stat>
-              <StatLabel>
+              {/* <StatLabel>
                 {status?.template_type === 'fixed' ? 'Parameter Regions' : 'Parameter Configs'}
               </StatLabel>
               <StatNumber>
@@ -876,15 +876,20 @@ const loadDatabaseResults = async () => {
                   (status?.regions_count || 0) : 
                   (status?.parameter_configs_count || 0)
                 }
-              </StatNumber>
+              </StatNumber> */}
+              <StatLabel>Failed Files</StatLabel>
+              <StatNumber>{status?.failed_files || 0}</StatNumber>
               <StatHelpText>
-                {status?.template_type === 'fixed' ? 
+                {/* {status?.template_type === 'fixed' ? 
                   (status?.has_coordinate_file ? 
                     'With coordinate transformation' : 
                     'Using original coordinates'
                   ) :
                   'Extracted parameter configurations'
-                }
+                } */}
+                <Text fontSize="xs" color="gray.500">
+                  Files with processing errors
+                </Text>
               </StatHelpText>
             </Stat>
           </CardBody>
@@ -1379,6 +1384,7 @@ const loadDatabaseResults = async () => {
                             <Th>Extraction Rate</Th>
                             <Th>Processed At</Th>
                             <Th>Status</Th>
+                            <Th>Error</Th>
                           </Tr>
                         </Thead>
                         <Tbody>
@@ -1435,6 +1441,19 @@ const loadDatabaseResults = async () => {
                                 <Badge colorScheme={result.has_error ? 'red' : 'green'}>
                                   {result.has_error ? 'Error' : 'Success'}
                                 </Badge>
+                              </Td>
+                              <Td maxW="200px">
+                                {result.has_error ? (
+                                  <Tooltip
+                                    label={<Text whiteSpace="pre-wrap">{result.error || 'Unknown error'}</Text>}
+                                    placement="top-start"
+                                    hasArrow
+                                  >
+                                    <Text fontSize="xs" color="red.600" noOfLines={2}>
+                                      {result.error || 'Unknown error'}
+                                    </Text>
+                                  </Tooltip>
+                                ) : ''}
                               </Td>
                             </Tr>
                           ))}

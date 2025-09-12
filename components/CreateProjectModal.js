@@ -31,7 +31,7 @@ import {
 import { Folder, Calendar, Info, Clock } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pdf-api.enigmahealth.io/api';
 
 const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   const [formData, setFormData] = useState({

@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api/files';
+const API_BASE_URL = '/api/files';
 
 const FileUploader = ({ templateType, onUpload, onBack, hideTitle, projectId }) => {
   const [files, setFiles] = useState([]);

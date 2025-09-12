@@ -13,6 +13,7 @@ import {
   useColorModeValue,
   Divider,
 } from '@chakra-ui/react';
+import Image from 'next/image';
 
 const Layout = ({ children }) => {
   const bgGradient = useColorModeValue(
@@ -35,11 +36,34 @@ const Layout = ({ children }) => {
   return (
     <>
       <Head>
-        <title>PDF Parser</title>
-        <meta name="description" content="Extract data from PDF documents effortlessly with AI assistance" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
+  <title>AI-Powered Document Extraction</title>
+  <meta name="description" content="Extract data from PDF documents effortlessly with AI assistance" />
+  
+  {/* Favicon and App Icons */}
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+  
+  {/* PWA Meta Tags */}
+  <meta name="theme-color" content="#3182ce" />
+  <meta name="msapplication-TileColor" content="#3182ce" />
+  
+  {/* Open Graph Meta Tags */}
+  <meta property="og:title" content="AI-Powered Document Extraction" />
+  <meta property="og:description" content="Extract data from PDF documents effortlessly with AI assistance" />
+  <meta property="og:image" content="/logo.png" />
+  <meta property="og:type" content="website" />
+  
+  {/* Twitter Card Meta Tags */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="" />
+  <meta name="twitter:description" content="Extract data from PDF documents effortlessly with AI assistance" />
+  <meta name="twitter:image" content="/logo.png" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</Head>
 
       <Box minH="100vh" bgGradient={bgGradient} color={textColor} display="flex" flexDirection="column">
         {/* Header */}
@@ -57,15 +81,19 @@ const Layout = ({ children }) => {
           <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
             <Flex justify="space-between" align="center">
               <Flex align="center">
-                {/* Document icon replacement */}
-                <Box fontSize="2xl" color={accentColor} mr={3}>
-                  📄
-                </Box>
-                <Box>
-                  <Heading as="h1" size="md">PDF Parser</Heading>
-                  <Text fontSize="xs" color={mutedColor}>Powered by AI</Text>
-                </Box>
-              </Flex>
+  {/* Replace document icon with logo */}
+  <Image
+    src="/logo.png"
+    alt="PDF Parser Logo"
+    width={160}
+    height={160}
+    style={{ marginRight: '12px' }}
+  />
+  <Box>
+    <Heading as="h1" size="md"></Heading>
+    <Text fontSize="xs" color={mutedColor}>Powered by AI</Text>
+  </Box>
+</Flex>
 
               <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
                 <Link href="#" color={mutedColor} _hover={{ color: accentColor }} fontSize="sm">
@@ -119,7 +147,7 @@ const Layout = ({ children }) => {
               textAlign={{ base: 'center', md: 'left' }}
             >
               <Text fontSize="sm" color={mutedColor} mb={{ base: 4, md: 0 }}>
-                &copy; {new Date().getFullYear()} PDF Parser. All rights reserved.
+                &copy; {new Date().getFullYear()} Enigma Health. All rights reserved.
               </Text>
               
               <HStack spacing={{ base: 4, md: 6 }} wrap="wrap" justify="center">
